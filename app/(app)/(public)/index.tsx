@@ -28,6 +28,7 @@ export default function Index() {
         <View>
           <SmoothInfiniteScroll scrollDirection="down" iconSet="set3" />
         </View>
+        {/* add lienar graduebt */}
         <LinearGradient
           colors={["transparent", "#fff"]}
           style={{
