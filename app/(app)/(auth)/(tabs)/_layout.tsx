@@ -18,6 +18,7 @@ const TabsLayout = () => {
         name="resturants"
         options={{
           title: "Resutrants",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons name="restaurant" color={color} size={size} />
           ),
