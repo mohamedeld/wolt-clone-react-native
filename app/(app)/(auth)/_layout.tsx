@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 
 const AuthLayout = () => {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: "Feed" }} />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
     </Stack>
   );
 };
