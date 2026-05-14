@@ -13,6 +13,20 @@ const PublicLayout = () => {
           },
         }}
       />
+      <Stack.Screen
+        name="other-options"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "#fff",
+          },
+          presentation: "formSheet",
+          title: "",
+          headerShadowVisible: false,
+          sheetAllowedDetents: [0.6],
+          sheetCornerRadius: 16,
+        }}
+      />
     </Stack>
   );
 };
