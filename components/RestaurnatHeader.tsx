@@ -1,36 +1,47 @@
 import { Colors } from "@/constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link, useRouter } from "expo-router";
-import React from "react";
+import { Link } from "expo-router";
+import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
   SharedValue,
+  useAnimatedReaction,
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { runOnJS } from "react-native-worklets";
 
-type RestaurnatHeader = {
+interface RestaurantHeaderProps {
   title: string;
   scrollOffset: SharedValue<number>;
-};
+}
 
-const SCROLL_THRESHOLD = 60;
+const SCOLL_THRESHOLD = 60;
 
-const RestaurnatHeader = ({ scrollOffset, title }: RestaurnatHeader) => {
+const RestaurantHeader = ({ title, scrollOffset }: RestaurantHeaderProps) => {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useAnimatedReaction(
+    () => scrollOffset.value > SCOLL_THRESHOLD * 0.6,
+    (isOver) => {
+      runOnJS(setIsScrolled)(isOver);
+    },
+  );
+
   const header1Style = useAnimatedStyle(() => {
     const opacity = interpolate(
       scrollOffset.value,
-      [0, SCROLL_THRESHOLD * 0.6],
+      [0, SCOLL_THRESHOLD * 0.6],
       [1, 0],
       Extrapolation.CLAMP,
     );
+
     const translateY = interpolate(
       scrollOffset.value,
-      [0, SCROLL_THRESHOLD * 0.6],
+      [0, SCOLL_THRESHOLD * 0.6],
       [0, -10],
       Extrapolation.CLAMP,
     );
@@ -40,16 +51,18 @@ const RestaurnatHeader = ({ scrollOffset, title }: RestaurnatHeader) => {
       transform: [{ translateY }],
     };
   });
+
   const header2Style = useAnimatedStyle(() => {
     const opacity = interpolate(
       scrollOffset.value,
-      [SCROLL_THRESHOLD * 0.3, SCROLL_THRESHOLD],
+      [SCOLL_THRESHOLD * 0.3, SCOLL_THRESHOLD],
       [0, 1],
       Extrapolation.CLAMP,
     );
+
     const translateY = interpolate(
       scrollOffset.value,
-      [SCROLL_THRESHOLD * 0.3, SCROLL_THRESHOLD],
+      [SCOLL_THRESHOLD * 0.3, SCOLL_THRESHOLD],
       [-10, 0],
       Extrapolation.CLAMP,
     );
@@ -59,48 +72,71 @@ const RestaurnatHeader = ({ scrollOffset, title }: RestaurnatHeader) => {
       transform: [{ translateY }],
     };
   });
+
+  const shadowStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+
+    return {
+      shadowOpacity: opacity * 0.1,
+      elevation: opacity * 4,
+    };
+  });
+
   return (
-    <Animated.View style={[styles.headerContainer]}>
+    <Animated.View
+      style={[styles.headerContainer, shadowStyle, { paddingTop: insets.top }]}
+    >
+      {/* Header 1 */}
       <Animated.View
-        style={[styles.header1, header1Style, { paddingTop: insets.top + 8 }]}
+        style={[styles.header1, header1Style]}
+        pointerEvents={isScrolled ? "none" : "auto"}
       >
-        <TouchableOpacity
-          style={styles.locationBtn}
-          onPress={() => {
-            console.log("pushing location");
-            router.push("/(app)/(auth)/(modal)/location");
-          }}
-        >
-          <View style={styles.locationBtnIcon}>
-            <Ionicons name="business-outline" size={16} />
-          </View>
-          <Text style={styles.locationTxt}>Munster</Text>
-          <Ionicons name="chevron-down" size={16} />
-        </TouchableOpacity>
-        <View style={styles.rightIcon}>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="filter" size={20} />
+        <Link href={"/(app)/(auth)/(modal)/location"} asChild>
+          <TouchableOpacity style={styles.locationButton}>
+            <View style={styles.locationButtonIcon}>
+              <Ionicons name="business-outline" size={16} />
+            </View>
+            <Text style={styles.locationText}>Münster</Text>
+            <Ionicons name="chevron-down" size={16} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Ionicons name="map-outline" size={20} />
-          </TouchableOpacity>
+        </Link>
+
+        <View style={styles.rightIcons}>
+          <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="filter" size={20} />
+            </TouchableOpacity>
+          </Link>
+          <Link href={"/(app)/(auth)/(modal)/map"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="map-outline" size={20} />
+            </TouchableOpacity>
+          </Link>
         </View>
       </Animated.View>
+
+      {/* Header 2 */}
       <Animated.View
-        style={[styles.header2, header2Style, { paddingTop: insets.top + 8 }]}
+        style={[styles.header2, header2Style]}
+        pointerEvents={isScrolled ? "auto" : "none"}
       >
         <View style={styles.centerContent}>
-          <Text style={styles.titleSm}>{title}</Text>
+          <Text style={styles.titleSmall}>{title}</Text>
           <Link href={"/(app)/(auth)/(modal)/location"} asChild>
-            <TouchableOpacity style={styles.locationSm}>
-              <Text style={styles.locationSmTxt}>Munster</Text>
+            <TouchableOpacity style={styles.locationSmall}>
+              <Text style={styles.locationSmallText}>Münster</Text>
               <Ionicons name="chevron-down" size={14} />
             </TouchableOpacity>
           </Link>
         </View>
-        <View style={styles.rightIcon}>
+        <View style={styles.rightIcons}>
           <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
-            <TouchableOpacity style={styles.iconBtn}>
+            <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="filter" size={20} />
             </TouchableOpacity>
           </Link>
@@ -110,8 +146,6 @@ const RestaurnatHeader = ({ scrollOffset, title }: RestaurnatHeader) => {
   );
 };
 
-export default RestaurnatHeader;
-
 const styles = StyleSheet.create({
   headerContainer: {
     position: "absolute",
@@ -119,39 +153,51 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: "#fff",
-    zIndex: 999,
-    boxShadow: "0px 2px 4px -2px rgba(0,0,0,0.2)",
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowRadius: 4,
+    zIndex: 100,
+    // boxShadow: '0px 2px 4px -2px rgba(0, 0, 0, 0.2)',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
   header1: {
     paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  locationBtn: {
+  header2: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  locationText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  locationButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
     borderRadius: 20,
+    gap: 6,
   },
-  locationBtnIcon: {
+  locationButtonIcon: {
     borderRadius: 20,
     backgroundColor: Colors.light,
     padding: 10,
   },
-  locationTxt: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  rightIcon: {
+  rightIcons: {
     flexDirection: "row",
     gap: 8,
   },
-  iconBtn: {
+  iconButton: {
     width: 40,
     height: 40,
     backgroundColor: Colors.light,
@@ -159,33 +205,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  header2: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   centerContent: {
     flex: 1,
     alignItems: "center",
     paddingLeft: 40,
   },
-  titleSm: {
+  titleSmall: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: 700,
     marginBottom: 2,
   },
-  locationSm: {
+  locationSmall: {
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
   },
-  locationSmTxt: {
+  locationSmallText: {
     fontSize: 12,
-    color: "#666",
+    color: Colors.muted,
   },
 });
+export default RestaurantHeader;

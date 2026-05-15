@@ -41,6 +41,7 @@ const TabsLayout = () => {
         name="stores"
         options={{
           title: "Stores",
+          headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "storefront" : "storefront-outline"}
