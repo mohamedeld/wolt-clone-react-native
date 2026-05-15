@@ -8,6 +8,7 @@ const AuthLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(modal)/map" />
       <Stack.Screen
         name="(modal)/location"
         options={{
