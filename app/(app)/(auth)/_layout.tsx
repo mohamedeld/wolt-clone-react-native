@@ -31,6 +31,32 @@ const AuthLayout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="(modal)/filter"
+        options={{
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.8],
+          title: "",
+          headerShadowVisible: false,
+          sheetCornerRadius: 16,
+          sheetGrabberVisible: true,
+          contentStyle: {
+            backgroundColor: "#fff",
+          },
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.dismiss()}
+              style={{
+                padding: 4,
+                borderRadius: 20,
+                backgroundColor: "#666",
+              }}
+            >
+              <Ionicons name="close-sharp" size={28} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 };
