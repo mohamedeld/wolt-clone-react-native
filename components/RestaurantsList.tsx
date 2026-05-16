@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/theme";
 import { useRestaurants } from "@/hooks/useRestuarants";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
@@ -13,6 +14,7 @@ import {
 
 const RestaurantsList = () => {
   const { data: restaurnts, isLoading, error } = useRestaurants();
+  const router = useRouter();
   if (isLoading) {
     return (
       <View>
@@ -24,7 +26,12 @@ const RestaurantsList = () => {
     <React.Fragment>
       {restaurnts?.map((item) => (
         <View key={item?.id}>
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              router.push(`/(app)/(auth)/(modal)/(restaurant)/${item?.id}`);
+            }}
+          >
             <Image source={item?.image ?? ""} style={styles?.image} />
             <View style={styles.info}>
               <Text style={styles.name}>{item?.name}</Text>
