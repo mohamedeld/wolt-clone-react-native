@@ -1,4 +1,5 @@
 import { MenuItem } from "@/components/MenuItem";
+import RestuarantDetailsHeader from "@/components/RestuarantDetailsHeader";
 
 import { Colors } from "@/constants/theme";
 import type { Dish } from "@/data/restaurant_menu";
@@ -168,7 +169,8 @@ const Page = () => {
         source={restaurant.image!}
       />
       <Animated.View style={[styles.whiteOverlay, overlayStyle]} />
-      <View style={{ zIndex: 10 }}></View>
+      <RestuarantDetailsHeader scrollOffset={scrollOffset} />
+      <View style={{ zIndex: 99 }}></View>
       <Animated.View
         style={[
           styles.stickyTabsOverlay,
